@@ -5,16 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\User; // 追加
+use App\Micropost; // 追加
 
 class UsersController extends Controller
 {
     public function index()
     {
-        $users = User::orderBy('id', 'desc')->paginate(10);
+        $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $microposts = $user->feed_microposts()->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('users.index', [
-            'users' => $users,
-        ]);
+            $data = [
+                'user' => $user,
+                'microposts' => $microposts,
+            ];
+        }
+        return view('welcome', $data);
     }
     
     public function show($id)
